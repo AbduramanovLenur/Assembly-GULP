@@ -1,32 +1,31 @@
-const { src, dest, task, series, watch, parallel, tree } = require('gulp');
-const rm = require('gulp-rm');
-const sass = require('gulp-sass')(require('sass'));
-const concat = require('gulp-concat');
-const browserSync = require('browser-sync').create();
-const reload = browserSync.reload;
-const sassGlob = require('gulp-sass-glob');
-const autoprefixer = require('gulp-autoprefixer');
-const gcmq = require('gulp-group-css-media-queries');
-const cleanCSS = require('gulp-clean-css');
-const sourcemaps = require('gulp-sourcemaps');
-const babel = require('gulp-babel');
-const uglify = require('gulp-uglify');
-const svgo = require('gulp-svgo');
-const svgSprite = require('gulp-svg-sprite');
-const gulpif = require('gulp-if');
-const imagemin = require('gulp-imagemin');
-const webpack = require('webpack-stream');
+import gulp from 'gulp';
+import rm from 'gulp-rm';
+import dartSass from 'sass';
+import gulpSass from 'gulp-sass';
+const sass = gulpSass(dartSass);
+import concat from 'gulp-concat';
+import browserSync from 'browser-sync';
+import sassGlob from 'gulp-sass-glob';
+import autoprefixer from 'gulp-autoprefixer';
+import gcmq from 'gulp-group-css-media-queries';
+import cleanCSS from 'gulp-clean-css';
+import sourcemaps from 'gulp-sourcemaps';
+import svgo from 'gulp-svgo';
+import svgSprite from 'gulp-svg-sprite';
+import gulpif from 'gulp-if';
+import imagemin from 'gulp-imagemin';
+import webpack from 'webpack-stream';
 
 const env = process.env.NODE_ENV;
 
 const dist = 'dist/';
 
-task('clean', () => {
-    return src('dist/**/*', { read: false }).pipe(rm())
+gulp.task('clean', () => {
+    return gulp.src('dist/**/*', { read: false }).pipe(rm())
 });
 
-task('copy:html', () => {
-    return src('src/*.html').pipe(dest(dist)).pipe(reload({ stream: true }));
+gulp.task('copy:html', () => {
+    return gulp.src('src/*.html').pipe(gulp.dest(dist)).pipe(browserSync.reload({ stream: true }));
 });
 
 const styles = [
@@ -34,8 +33,8 @@ const styles = [
     'src/scss/style.scss',
 ];
 
-task('styles', () => {
-    return src(styles)
+gulp.task('styles', () => {
+    return gulp.src(styles)
         .pipe(gulpif(env === 'dev', sourcemaps.init()))
         .pipe(concat('style.min.scss'))
         .pipe(sassGlob())
@@ -46,12 +45,12 @@ task('styles', () => {
         .pipe(gulpif(env === 'prod', gcmq()))
         .pipe(gulpif(env === 'prod', cleanCSS()))
         .pipe(gulpif(env === 'dev', sourcemaps.write()))
-        .pipe(dest(`${dist}/css`))
-        .pipe(reload({ stream: true }))
+        .pipe(gulp.dest(`${dist}/css`))
+        .pipe(browserSync.reload({ stream: true }))
 });
 
-task('scripts', () => {
-    return src('src/js/main.js')
+gulp.task('scripts', () => {
+    return gulp.src('src/js/main.js')
         .pipe(webpack({
             mode: 'development',
             output: {
@@ -78,12 +77,12 @@ task('scripts', () => {
                 ]
             }
         }))
-        .pipe(dest(dist))
+        .pipe(gulp.dest(dist))
         .on("end", browserSync.reload);
 });
 
-task('scripts-build', () => {
-    return src('src/js/main.js')
+gulp.task('scripts-build', () => {
+    return gulp.src('src/js/main.js')
         .pipe(webpack({
             mode: 'production',
             output: {
@@ -107,11 +106,11 @@ task('scripts-build', () => {
                 ]
             }
         }))
-        .pipe(dest(dist));
+        .pipe(gulp.dest(dist));
 });
 
-task('icons', () => {
-    return src('src/assets/icons/*.svg')
+gulp.task('icons', () => {
+    return gulp.src('src/assets/icons/*.svg')
         .pipe(svgo({
             plugins: [{
                 removeAttrs: {
@@ -126,18 +125,18 @@ task('icons', () => {
                 }
             }
         }))
-        .pipe(dest(`${dist}/assets/icons`))
-        .pipe(reload({ stream: true }));
+        .pipe(gulp.dest(`${dist}/assets/icons`))
+        .pipe(browserSync.reload({ stream: true }));
 });
 
-task('copy-assets', () => {
-    return src(['src/assets/**/*.*', '!src/assets/icons/*.svg'])
-        .pipe(dest(`${dist}/assets`))
-        .pipe(reload({ stream: true }))
+gulp.task('copy-assets', () => {
+    return gulp.src(['src/assets/**/*.*', '!src/assets/icons/*.svg'])
+        .pipe(gulp.dest(`${dist}/assets`))
+        .pipe(browserSync.reload({ stream: true }))
 });
 
-task('img-compress', () => {
-    return src('src/assets/img/**/*.*')
+gulp.task('img-compress', () => {
+    return gulp.src('src/assets/img/**/*.*')
         .pipe(gulpif(env === 'prod', imagemin([
             imagemin.gifsicle({ interlaced: true }),
             imagemin.mozjpeg({ quality: 75, progressive: true }),
@@ -149,10 +148,10 @@ task('img-compress', () => {
                 ]
             })
         ])))
-        .pipe(dest(`${dist}/assets/img`))
+        .pipe(gulp.dest(`${dist}/assets/img`))
 });
 
-task('server', () => {
+gulp.task('server', () => {
     browserSync.init({
         server: {
             baseDir: `./${dist}`
@@ -160,13 +159,13 @@ task('server', () => {
     });
 });
 
-task('watch', () => {
-    watch('./src/scss/**/*.scss', series('styles'));
-    watch('./src/*.html', series('copy:html'));
-    watch('./src/js/**/*.js', series('scripts'));
-    watch('./src/assets/icons/*.svg', series('icons'));
-    watch('./src/assets/**/*.*', series('copy-assets'));
+gulp.task('watch', () => {
+    gulp.watch('./src/scss/**/*.scss', gulp.series('styles'));
+    gulp.watch('./src/*.html', gulp.series('copy:html'));
+    gulp.watch('./src/js/**/*.js', gulp.series('scripts'));
+    gulp.watch('./src/assets/icons/*.svg', gulp.series('icons'));
+    gulp.watch('./src/assets/**/*.*', gulp.series('copy-assets'));
 });
 
-task('default', series('clean', parallel('copy:html', 'styles', 'scripts', 'icons', 'copy-assets', 'watch', 'server')));
-task('build', series('clean', parallel('copy:html', 'styles', 'scripts', 'icons', 'copy-assets', 'img-compress', 'scripts-build')));
+gulp.task('default', gulp.series('clean', gulp.parallel('copy:html', 'styles', 'scripts', 'icons', 'copy-assets', 'watch', 'server')));
+gulp.task('build', gulp.series('clean', gulp.parallel('copy:html', 'styles', 'scripts', 'icons', 'copy-assets', 'img-compress', 'scripts-build')));
