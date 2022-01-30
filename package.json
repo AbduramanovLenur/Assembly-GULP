@@ -39,6 +39,6 @@
   },
   "dependencies": {
     "core-js": "^3.20.1",
-    "normalize.css": "^8.0.1"
+    "ress": "^4.0.0"
   }
 }

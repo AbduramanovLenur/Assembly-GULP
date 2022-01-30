@@ -29,7 +29,7 @@ gulp.task('copy:html', () => {
 });
 
 const styles = [
-    'node_modules/normalize.css/normalize.css',
+    'node_modules/ress/ress.css',
     'src/scss/style.scss',
 ];
 
