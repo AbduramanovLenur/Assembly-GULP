@@ -31,6 +31,16 @@ gulp.task('clean', () => {
 //     return gulp.src('src/*.html').pipe(gulp.dest(dist)).pipe(browserSync.reload({ stream: true }));
 // });
 
+gulp.task('gulpEJS', function () {
+    return gulp.src("src/ejs/*.ejs")
+        .pipe(gulpEjs({
+            moduleName: 'templates'
+        }))
+        .pipe(rename({ extname: '.html' }))
+        .pipe(gulp.dest(dist))
+        .pipe(browserSync.reload({ stream: true }))
+})
+
 const styles = [
     'node_modules/ress/ress.css',
     'src/scss/style.scss',
@@ -83,16 +93,6 @@ gulp.task('scripts', () => {
         .pipe(gulp.dest(dist))
         .on("end", browserSync.reload);
 });
-
-gulp.task('gulpEJS', function () {
-    return gulp.src("src/ejs/*.ejs")
-        .pipe(gulpEjs({
-            moduleName: 'templates'
-        }))
-        .pipe(rename({ extname: '.html' }))
-        .pipe(gulp.dest(dist))
-        .pipe(browserSync.reload({ stream: true }))
-})
 
 gulp.task('scripts-build', () => {
     return gulp.src('src/js/main.js')
