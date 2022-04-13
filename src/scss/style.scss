@@ -1,5 +1,40 @@
 * {
     box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+main {
+    flex: 1;
+    overflow-x: hidden;
+}
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+input {
+    font-weight: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+address {
+    font-style: normal;
+}
+a,
+button {
+    display: inline-flex;
+}
+li {
+    list-style: none;
+}
+a {
+    text-decoration: none;
 }
 
 @import "blocks/*.scss";

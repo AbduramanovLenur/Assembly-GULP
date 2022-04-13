@@ -15,6 +15,9 @@ import svgSprite from 'gulp-svg-sprite';
 import gulpif from 'gulp-if';
 import imagemin from 'gulp-imagemin';
 import webpack from 'webpack-stream';
+import gulpEjs from 'gulp-ejs';
+import log from 'fancy-log';
+import rename from 'gulp-rename';
 
 const env = process.env.NODE_ENV;
 
@@ -24,9 +27,9 @@ gulp.task('clean', () => {
     return gulp.src('dist/**/*', { read: false }).pipe(rm())
 });
 
-gulp.task('copy:html', () => {
-    return gulp.src('src/*.html').pipe(gulp.dest(dist)).pipe(browserSync.reload({ stream: true }));
-});
+// gulp.task('copy:html', () => {
+//     return gulp.src('src/*.html').pipe(gulp.dest(dist)).pipe(browserSync.reload({ stream: true }));
+// });
 
 const styles = [
     'node_modules/ress/ress.css',
@@ -80,6 +83,16 @@ gulp.task('scripts', () => {
         .pipe(gulp.dest(dist))
         .on("end", browserSync.reload);
 });
+
+gulp.task('gulpEJS', function () {
+    return gulp.src("src/ejs/*.ejs")
+        .pipe(gulpEjs({
+            moduleName: 'templates'
+        }))
+        .pipe(rename({ extname: '.html' }))
+        .pipe(gulp.dest(dist))
+        .pipe(browserSync.reload({ stream: true }))
+})
 
 gulp.task('scripts-build', () => {
     return gulp.src('src/js/main.js')
@@ -161,11 +174,12 @@ gulp.task('server', () => {
 
 gulp.task('watch', () => {
     gulp.watch('./src/scss/**/*.scss', gulp.series('styles'));
-    gulp.watch('./src/*.html', gulp.series('copy:html'));
+    // gulp.watch('./src/*.html', gulp.series('copy:html'));
+    gulp.watch('./src/ejs/*.ejs', gulp.series('gulpEJS'));
     gulp.watch('./src/js/**/*.js', gulp.series('scripts'));
     gulp.watch('./src/assets/icons/*.svg', gulp.series('icons'));
     gulp.watch('./src/assets/**/*.*', gulp.series('copy-assets'));
 });
 
-gulp.task('default', gulp.series('clean', gulp.parallel('copy:html', 'styles', 'scripts', 'icons', 'copy-assets', 'watch', 'server')));
-gulp.task('build', gulp.series('clean', gulp.parallel('copy:html', 'styles', 'scripts', 'icons', 'copy-assets', 'img-compress', 'scripts-build')));
+gulp.task('default', gulp.series('clean', gulp.parallel('gulpEJS', 'styles', 'scripts', 'icons', 'copy-assets', 'watch', 'server')));
+gulp.task('build', gulp.series('clean', gulp.parallel('gulpEJS', 'styles', 'scripts', 'icons', 'copy-assets', 'img-compress', 'scripts-build')));
