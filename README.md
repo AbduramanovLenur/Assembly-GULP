@@ -7,7 +7,7 @@
 * npm run gulp - запуск development версии
 * npm run build - запуск productin версии
 
-# Project "Assembly Gulp":
+# Project "Assembly GULP":
 
 The build compiles the syntax of the ejs code into regular HTML code and redirects the HTML files from the src folder to the dist folder. Compiles SCSS/SASS code syntax to CSS and redirects from src folder to dist folder. Installed autoprefixer for CSS code. Webpack has been installed to use and write code in the EcmaScript6+ standard, as well as use imports and exports. Installed the babel js polyfill to translate from the new standard to the old one. An npm plugin has been installed to generate svg-sprite. Redirects the assets folder from the src directory to the dist directory, where the images, favicon, fonts and icons folders are stored. Installed a plugin for compressing and optimizing images of all formats (gif, jpeg, png, svg) in the production version. The assembly compresses the css and js files in the production version. The development version also includes sourcemaps for SCSS and JavaScript files. The assembly starts local hosting.
 
